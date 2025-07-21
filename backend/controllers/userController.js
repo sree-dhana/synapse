@@ -8,20 +8,21 @@ const userLogin=asyncHandler(async(req,res)=>{
     
 });
 const userRegister=asyncHandler(async(req,res)=>{
-    req.body={username,email,password,role};
+    const {username,email,password,role}=req.body;
     if(!username||!email||!password||!role){
         res.status(400);
         throw new Error("all fields are mandatory");
     }
-    const userExists=User.findOne({email});
+    const userExists=await User.findOne({email});
     if(userExists){
         res.status(409);
         throw new Error("user already exists");
     }
-    const hasPassword=bcrypt.hash(password,10);
+    const hasPassword=await bcrypt.hash(password,10);
     const user=await User.create({
         email,
         password:hasPassword,
+        username,
         role 
     });
     res.status(200);
