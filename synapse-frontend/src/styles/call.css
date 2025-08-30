@@ -1,0 +1,275 @@
+.call-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.call-container {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.call-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #333;
+}
+
+.call-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.close-btn {
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #ff3740;
+}
+
+.video-grid {
+  flex: 1;
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.video-container {
+  position: relative;
+  background: #2c2c2c;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.video-off {
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-off::after {
+  content: '📷';
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.video-label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.local-video {
+  border: 2px solid #4a90e2;
+}
+
+.remote-video {
+  border: 2px solid #333;
+}
+
+.audio-only {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar {
+  font-size: 4rem;
+  opacity: 0.8;
+}
+
+.call-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px 0;
+}
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+  transform: scale(1.1);
+}
+
+.control-btn:not(.end-call):not(.muted):not(.video-off) {
+  background: #4a90e2;
+  color: white;
+}
+
+.control-btn.muted {
+  background: #ff4757;
+  color: white;
+}
+
+.control-btn.video-off {
+  background: #ff6b7a;
+  color: white;
+}
+
+.control-btn.end-call {
+  background: #ff4757;
+  color: white;
+  font-size: 1.4rem;
+}
+
+.control-btn.end-call:hover {
+  background: #ff3740;
+}
+
+/* Call notification styles */
+.call-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #2c3e50;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  min-width: 300px;
+}
+
+.call-notification h4 {
+  margin: 0 0 10px 0;
+  color: #4a90e2;
+}
+
+.call-notification p {
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+}
+
+.call-notification-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.call-notification-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.call-notification-btn.accept {
+  background: #27ae60;
+  color: white;
+}
+
+.call-notification-btn.accept:hover {
+  background: #229954;
+}
+
+.call-notification-btn.decline {
+  background: #e74c3c;
+  color: white;
+}
+
+.call-notification-btn.decline:hover {
+  background: #c0392b;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .call-container {
+    width: 95vw;
+    height: 95vh;
+    padding: 15px;
+  }
+  
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .control-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+  
+  .call-notification {
+    left: 20px;
+    right: 20px;
+    min-width: auto;
+  }
+}
+
+/* Voice message recording animation */
+.recording-pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

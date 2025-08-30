@@ -4,18 +4,18 @@ import { useState } from "react"
 
 const PdfAnalyzer = () => {
   const [uploadedFile, setUploadedFile] = useState(null)
-  const [tasks, setTasks] = useState([
-    { id: 1, text: "Read Chapter 1: Introduction to React", completed: false },
-    { id: 2, text: "Complete practice exercises", completed: true },
-    { id: 3, text: "Review component lifecycle", completed: false },
-    { id: 4, text: "Build a simple todo app", completed: false },
-  ])
 
   const roadmapSteps = [
     { id: 1, title: "Foundation", description: "Learn React basics and JSX syntax", status: "completed" },
-    { id: 2, title: "Components", description: "Master functional and class components", status: "current" },
-    { id: 3, title: "State Management", description: "Understand useState and useEffect hooks", status: "upcoming" },
+    { id: 2, title: "Components", description: "Master functional and class components", status: "completed" },
+    { id: 3, title: "State Management", description: "Understand useState and useEffect hooks", status: "current" },
     { id: 4, title: "Advanced Patterns", description: "Context API and custom hooks", status: "upcoming" },
+    { id: 5, title: "Routing", description: "Implement client-side routing with React Router", status: "upcoming" },
+    { id: 6, title: "Performance", description: "Optimize with memo, useMemo, and useCallback", status: "upcoming" },
+    { id: 7, title: "Testing", description: "Write unit tests with Jest and React Testing Library", status: "upcoming" },
+    { id: 8, title: "Deployment", description: "Deploy React apps to production", status: "upcoming" },
+    { id: 9, title: "Advanced State", description: "Redux or Zustand for complex state management", status: "upcoming" },
+    { id: 10, title: "TypeScript", description: "Add type safety with TypeScript", status: "upcoming" },
   ]
 
   const handleFileUpload = (e) => {
@@ -23,10 +23,6 @@ const PdfAnalyzer = () => {
     if (file && file.type === "application/pdf") {
       setUploadedFile(file)
     }
-  }
-
-  const toggleTask = (taskId) => {
-    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task)))
   }
 
   return (
@@ -73,26 +69,7 @@ const PdfAnalyzer = () => {
         </div>
       </div>
 
-      {/* Tasks Section */}
-      <div className="tasks-section">
-        <h3 className="section-title">AI Suggested Tasks</h3>
-        <div className="tasks-container">
-          {tasks.map((task) => (
-            <div key={task.id} className={`task-item ${task.completed ? "completed" : ""}`}>
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => toggleTask(task.id)}
-                className="task-checkbox"
-                id={`task-${task.id}`}
-              />
-              <label htmlFor={`task-${task.id}`} className="task-label">
-                {task.text}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
+
     </div>
   )
 }

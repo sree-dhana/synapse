@@ -5,33 +5,30 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Rooms from "./components/Room";
+import { clearAuth } from "./utils/auth";
 
 function App() {
- 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [authKey, setAuthKey] = useState(0); // Force re-render on auth changes
+
+  const handleLogin = () => {
+    setAuthKey(prev => prev + 1); // Trigger re-render
+  };
+
+  const handleLogout = () => {
+    clearAuth(); // Use auth utility to clear authentication
+    setAuthKey(prev => prev + 1); // Trigger re-render
+  };
 
   return (
-    <Router>
+    <Router key={authKey}>
       <Routes>
-      
         <Route path="/" element={<LandingPage />} />
-
-        <Route path="/login" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
-
-        <Route path="/signup" element={<Signup onSignup={() => setIsLoggedIn(true)} />} />
-
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/signup" element={<Signup onSignup={handleLogin} />} />
         
-        <Route
-          path="/dashboard"
-          element={isLoggedIn ? <Dashboard /> : <Login onLogin={() => setIsLoggedIn(true)} />}
-        />
-
-       
-        <Route
-          path="/rooms"
-          element={isLoggedIn ? <Rooms /> : <Login onLogin={() => setIsLoggedIn(true)} />}
-        />
-
+        {/* Routes that depend on backend authentication */}
+        <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
+        <Route path="/rooms" element={<Rooms onLogout={handleLogout} />} />
       </Routes>
     </Router>
   );

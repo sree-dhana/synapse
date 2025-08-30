@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { login } from "../api"
+import { setAuth, clearAuth } from "../utils/auth"
 import "../styles/login.css"
 
 const Login = ({ onLogin }) => {
@@ -14,13 +15,44 @@ const Login = ({ onLogin }) => {
     e.preventDefault()
     setError("")
     setLoading(true)
+    
+    if (!email.trim() || !password) {
+      setError("Please enter both email and password")
+      setLoading(false)
+      return
+    }
+    
     try {
       const res = await login({ email: email.trim(), password })
-      localStorage.setItem("token", res.data.accessToken)
+      
+      if (!res.data.accessToken || !res.data.username) {
+        throw new Error("Invalid response from server")
+      }
+      
+      setAuth(res.data.accessToken, res.data.username, res.data.role || "student")
+      
+      localStorage.setItem('userEmail', res.data.email)
+      
       if (onLogin) onLogin()
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed")
+      console.error("Login error:", err)
+      
+      clearAuth()
+      
+      if (err.response?.status === 401) {
+        setError("Incorrect password. Please check your credentials.")
+      } else if (err.response?.status === 404) {
+        setError("User not found. Please sign up first or check your email.")
+      } else if (err.response?.status === 400) {
+        setError("Please fill in all required fields.")
+      } else if (err.response?.status === 403) {
+        setError("Account access denied. Please contact administrator.")
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message)
+      } else {
+        setError("Login failed. Please check your credentials and try again.")
+      }
     } finally {
       setLoading(false)
     }

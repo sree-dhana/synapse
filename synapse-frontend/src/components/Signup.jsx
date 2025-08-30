@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { register, login } from "../api"
+import { setAuth } from "../utils/auth"
 import "../styles/login.css"
 
 const Signup = ({ onSignup }) => {
@@ -23,6 +24,18 @@ const Signup = ({ onSignup }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
+    
+    // Basic validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
+      setError("Please fill in all required fields")
+      return
+    }
+    
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long")
+      return
+    }
+    
     setLoading(true)
     try {
       // Backend expects username,email,password,role
@@ -32,13 +45,31 @@ const Signup = ({ onSignup }) => {
         password: formData.password,
         role: formData.userType
       })
+      
       // Auto login to get token
       const res = await login({ email: formData.email.trim(), password: formData.password })
-      localStorage.setItem('token', res.data.accessToken)
+      
+      // Use auth utility to set authentication data
+      setAuth(res.data.accessToken, formData.name.trim(), formData.userType)
+      
+      // Store email from server response for participant identification
+      localStorage.setItem('userEmail', res.data.email || formData.email.trim())
+      
       if (onSignup) onSignup()
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
+      console.error("Registration error:", err)
+      
+      // Handle different types of registration errors
+      if (err.response?.status === 409) {
+        setError("An account with this email already exists. Please login instead.")
+      } else if (err.response?.status === 400) {
+        setError(err.response?.data?.message || "Invalid registration data. Please check your information.")
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message)
+      } else {
+        setError('Registration failed. Please check your information and try again.')
+      }
     } finally {
       setLoading(false)
     }

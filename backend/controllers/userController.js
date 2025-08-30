@@ -13,7 +13,7 @@ const userLogin=asyncHandler(async(req,res)=>{
     }
     const user=await User.findOne({email});
     if(!user){
-        res.status(400);
+        res.status(404);  // Changed from 400 to 404
         throw new Error("user not found");
     }
     if(user && (await bcrypt.compare(password,user.password))){
@@ -21,17 +21,22 @@ const userLogin=asyncHandler(async(req,res)=>{
             user:{
                 id:user._id,
                 role:user.role,
-                email:user.email
-
+                email:user.email,
+                username:user.username
             }
             
         },
         (process.env.ACCESS_TOKEN), 
         {expiresIn:'1h'}
         ) ;
-        res.status(200).json({accessToken});
+        res.status(200).json({
+            accessToken,
+            username: user.username,
+            role: user.role,
+            email: user.email  // Include email in response
+        });
     }else{
-        res.status(200);
+        res.status(401);  // Changed from 200 to 401
         throw new Error("invalid password or email")
     }
 });
