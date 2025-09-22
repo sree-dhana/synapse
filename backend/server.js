@@ -29,14 +29,8 @@ app.use(express.json());
 
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow no-origin requests (like curl) and explicit allowed origins
-    if (!origin || ALLOWED_ORIGINS.has(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  origin: "https://synapse-frontend-bq7m.onrender.com",
+  credentials: true
 }));
 
 app.use("/api/mainpage", require("./routes/userRoutes"));
