@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const connectDB = require("./config/dbConnections");
 const errorHandler = require("./middleware/errorHandling");
@@ -393,6 +394,17 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+// ===== Optional: Serve Frontend (SPA) in production =====
+// Enable by setting SERVE_FRONTEND=true and ensuring the frontend is built to ../synapse-frontend/dist
+if (process.env.SERVE_FRONTEND === 'true') {
+  const distPath = path.resolve(__dirname, '..', 'synapse-frontend', 'dist');
+  app.use(express.static(distPath));
+  // History API fallback for React Router
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 connectDB();
 app.use(errorHandler);

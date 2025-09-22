@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { register, login } from "../api"
 import { setAuth } from "../utils/auth"
 import "../styles/login.css"
@@ -172,10 +172,7 @@ const Signup = ({ onSignup }) => {
 
         <div className="login-footer">
           <p className="signup-text">
-            Already have an account?{" "}
-            <a href="/login" className="signup-link">
-              Login
-            </a>
+            Already have an account? <Link to="/login" className="signup-link">Login</Link>
           </p>
         </div>
       </div>

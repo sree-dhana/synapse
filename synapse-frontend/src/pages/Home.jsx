@@ -1,4 +1,5 @@
 import "../styles/home.css"
+import { Link } from "react-router-dom"
 
 const Home = () => {
   return (
@@ -13,9 +14,7 @@ const Home = () => {
             <a href="#features">Features</a>
             <a href="#about">About</a>
             <a href="#contact">Contact</a>
-            <a href="/login" className="login-link">
-              Login
-            </a>
+            <Link to="/login" className="login-link">Login</Link>
           </div>
         </div>
       </nav>
@@ -45,9 +44,7 @@ const Home = () => {
                 <span>Global Community</span>
               </div>
             </div>
-            <a href="/login" className="cta-button">
-              Get Started
-            </a>
+            <Link to="/login" className="cta-button">Get Started</Link>
           </div>
           <div className="hero-visual">
             <div className="floating-card card-1">
