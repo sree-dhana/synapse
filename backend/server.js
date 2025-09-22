@@ -16,10 +16,13 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // ===== CORS Setup =====
-const allowedOrigins = [
+const baseAllowedOrigins = [
   "http://localhost:5173",                     // local dev
   "https://synapse-frontend-bq7m.onrender.com" // deployed frontend
 ];
+const envOriginsRaw = process.env.FRONTEND_BASE_URL || process.env.FRONTEND_ORIGINS || "";
+const envOrigins = envOriginsRaw.split(',').map(o => o.trim()).filter(Boolean);
+const allowedOrigins = Array.from(new Set([...baseAllowedOrigins, ...envOrigins]));
 
 const DEBUG_CORS = process.env.DEBUG_CORS === 'true';
 
@@ -35,7 +38,8 @@ const corsOptions = {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
-    return callback(null, true);
+    // Echo back the allowed origin so Access-Control-Allow-Origin matches the request
+    return callback(null, origin);
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
@@ -64,7 +68,8 @@ const io = new Server(server, {
     origin: function(origin, callback) {
       const allowed = (!origin || allowedOrigins.includes(origin));
       if (DEBUG_CORS) console.log(`[Socket.io CORS] origin=${origin} allowed=${allowed}`);
-      if (allowed) return callback(null, true);
+      if (!origin && allowed) return callback(null, true);
+      if (origin && allowed) return callback(null, origin);
       return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET','POST'],
