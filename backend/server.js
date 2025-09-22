@@ -10,7 +10,18 @@ const pdfRoutes = require('./routes/pdfRoutes');
 const geminiPdfRoutes = require('./routes/geminiPdfRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
-const FRONTEND_ORIGIN = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
+// Support one or more allowed frontend origins via env (comma-separated)
+const FRONTEND_ORIGIN_ENV = process.env.FRONTEND_BASE_URL || '';
+const FRONTEND_ORIGINS = FRONTEND_ORIGIN_ENV
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
+// Defaults include local dev and deployed frontend on Render
+const DEFAULT_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://synapse-frontend-bq7m.onrender.com'
+];
+const ALLOWED_ORIGINS = new Set([...DEFAULT_ALLOWED_ORIGINS, ...FRONTEND_ORIGINS]);
 const taskRoutes = require('./routes/taskRoutes');
 
 
@@ -20,8 +31,7 @@ app.use(express.json());
 app.use(cors({
   origin: (origin, callback) => {
     // Allow no-origin requests (like curl) and explicit allowed origins
-    const allowed = [FRONTEND_ORIGIN, 'https://synapse-a7uk.onrender.com'];
-    if (!origin || allowed.includes(origin)) return callback(null, true);
+    if (!origin || ALLOWED_ORIGINS.has(origin)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -39,8 +49,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
-      const allowed = [FRONTEND_ORIGIN, 'https://synapse-a7uk.onrender.com'];
-      if (!origin || allowed.includes(origin)) return callback(null, true);
+      if (!origin || ALLOWED_ORIGINS.has(origin)) return callback(null, true);
       return callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET','POST'],
