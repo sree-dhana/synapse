@@ -45,7 +45,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ===== FIX: Preflight handling =====
-app.options('*', cors(corsOptions));  // <- changed from '(.*)' to '*'
+app.options('/(.*)', cors(corsOptions));  // <- changed from '(.*)' to '/(.*)'
 
 app.use(express.json());
 
@@ -82,7 +82,7 @@ if (process.env.SERVE_FRONTEND === 'true') {
   const distPath = path.resolve(__dirname, '..', 'synapse-frontend', 'dist');
   app.use(express.static(distPath));
   // ===== FIX: Catch-all route =====
-  app.get('*', (req, res) => {   // <- changed from '(.*)' to '*'
+  app.get('/(.*)', (req, res) => {   // <- changed from '(.*)' to '/(.*)'
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
