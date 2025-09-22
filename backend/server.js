@@ -44,7 +44,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 // Handle preflight explicitly (Express 5: use '/*' instead of '*')
-app.options('/*', cors(corsOptions));
+app.options('(.*)', cors(corsOptions));
 
 app.use(express.json());
 
@@ -80,8 +80,8 @@ app.set('io', io);
 if (process.env.SERVE_FRONTEND === 'true') {
   const distPath = path.resolve(__dirname, '..', 'synapse-frontend', 'dist');
   app.use(express.static(distPath));
-  // Express 5: use '/*' instead of '*'
-  app.get('/*', (req, res) => {
+  // Express 5: use '(.*)' catch-all pattern
+  app.get('(.*)', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
