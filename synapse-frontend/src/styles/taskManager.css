@@ -202,6 +202,21 @@
   background: rgba(139, 92, 246, 0.05);
 }
 
+.task-item.ai-pdf-task {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  position: relative;
+}
+
+.task-item.ai-pdf-task::before {
+  content: '📄';
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
 .task-item.group-task {
   border-left-color: #3b82f6;
   background: rgba(59, 130, 246, 0.05);
@@ -278,6 +293,12 @@
 .ai-task .task-type-label {
   background: rgba(139, 92, 246, 0.2);
   color: #c4b5fd;
+}
+
+.ai-pdf-task .task-type-label {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  font-weight: 600;
 }
 
 .group-task .task-type-label {

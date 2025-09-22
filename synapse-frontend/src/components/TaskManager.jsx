@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import '../styles/taskManager.css'
 
-const TaskManager = ({ socket, roomId, username }) => {
+const TaskManager = ({ socket, roomId, username, pdfTasks = [] }) => {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
   const [taskType, setTaskType] = useState('group')
@@ -26,6 +26,18 @@ const TaskManager = ({ socket, roomId, username }) => {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Handle PDF tasks integration
+  useEffect(() => {
+    if (pdfTasks && pdfTasks.length > 0) {
+      console.log('[TaskManager] Adding PDF tasks:', pdfTasks);
+      setTasks(prev => {
+        // Remove any existing PDF tasks and add new ones
+        const nonPdfTasks = prev.filter(task => task.type !== 'ai-pdf');
+        return [...nonPdfTasks, ...pdfTasks];
+      });
+    }
+  }, [pdfTasks]);
 
   useEffect(() => {
     if (!socket) return
@@ -97,7 +109,7 @@ const TaskManager = ({ socket, roomId, username }) => {
     } else if (task.type === 'group' && socket && roomId) {
       // Send group task toggle to server
       socket.emit('toggle-group-task', { roomId, taskId, completed: updatedTask.completed })
-    } else if (task.type === 'ai') {
+    } else if (task.type === 'ai' || task.type === 'ai-pdf') {
       // Update AI task locally (each user's progress is independent)
       setTasks(prev => prev.map(t => t.id === taskId ? updatedTask : t))
     }
@@ -106,6 +118,7 @@ const TaskManager = ({ socket, roomId, username }) => {
   const getTaskTypeColor = (type) => {
     switch (type) {
       case 'ai': return 'ai-task'
+      case 'ai-pdf': return 'ai-pdf-task'
       case 'group': return 'group-task'
       case 'personal': return 'personal-task'
       default: return 'group-task'
@@ -115,6 +128,7 @@ const TaskManager = ({ socket, roomId, username }) => {
   const getTaskTypeLabel = (type) => {
     switch (type) {
       case 'ai': return '🤖 AI Suggested'
+      case 'ai-pdf': return '📄 PDF Analysis'
       case 'group': return '👥 Group Task'
       case 'personal': return '👤 Personal'
       default: return '👥 Group Task'

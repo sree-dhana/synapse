@@ -1,12 +1,60 @@
-# React + Vite
+# Synapse Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for the Synapse project, built with React and Vite. It provides the user interface for authentication, chat, room management, PDF analysis, and more.
 
-Currently, two official plugins are available:
+## Features
+- User authentication (login, signup, protected routes)
+- Real-time chat and voice messaging
+- Room creation and management
+- Task management
+- PDF analysis
+- Modern, responsive UI
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
+- React
+- Vite
+- CSS
 
-## Expanding the ESLint configuration
+## Project Structure
+```
+synapse-frontend/
+  public/             # Static assets
+  src/
+    api.js           # API calls
+    App.jsx          # Main app component
+    main.jsx         # Entry point
+    components/      # UI components
+    hooks/           # Custom React hooks
+    pages/           # Page components
+    styles/          # CSS files
+    utils/           # Utility functions
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Getting Started
+
+### Prerequisites
+- Node.js (v16+ recommended)
+- npm or yarn
+
+### Setup
+```bash
+cd synapse-frontend
+npm install
+npm run dev
+```
+
+The app will be available at `http://localhost:5173` by default.
+
+## Scripts
+- `npm run dev`: Start the Vite development server
+- `npm run build`: Build for production
+- `npm run preview`: Preview the production build
+
+## Environment Variables
+- Configure API endpoints and other settings in a `.env` file if needed.
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+[MIT](../LICENSE)

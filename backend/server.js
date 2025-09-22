@@ -5,9 +5,12 @@ const errorHandler = require("./middleware/errorHandling");
 const http = require("http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv").config();
-
+const pdfRoutes = require('./routes/pdfRoutes');
+const geminiPdfRoutes = require('./routes/geminiPdfRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
+const taskRoutes = require('./routes/taskRoutes');
+
 
 app.use(express.json());
 
@@ -19,7 +22,9 @@ app.use(cors({
 
 app.use("/api/mainpage", require("./routes/userRoutes"));
 app.use("/api/room", require("./routes/roomRoutes"));
-
+app.use('/api/pdf', pdfRoutes);
+app.use('/api', geminiPdfRoutes);
+app.use('/api/roadmaps', taskRoutes);
 
 const server = http.createServer(app);
 
@@ -31,6 +36,9 @@ const io = new Server(server, {
     credentials: true
   }
 });
+
+// Make io available in routes/controllers via req.app.get('io')
+app.set('io', io);
 
 
 // Room management - mapping roomId to participants
@@ -92,10 +100,12 @@ function broadcastParticipants(roomId, io) {
 }
 
 
+const RoomAnalysis = require('./models/RoomAnalysis');
+
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
-  socket.on("join-room", ({ roomId, username }) => {
+  socket.on("join-room", async ({ roomId, username }) => {
     if (!roomId || !username) {
       socket.emit("message", "roomId or username missing");
       return;
@@ -114,6 +124,22 @@ io.on("connection", (socket) => {
     
     // Broadcast updated participants list to everyone in the room
     broadcastParticipants(roomId, io);
+
+    // Send latest saved analysis for this room to the joining user
+    try {
+      const latest = await RoomAnalysis.findOne({ roomId });
+      if (latest) {
+        socket.emit('room-analysis-updated', {
+          roomId,
+          fileName: latest.fileName,
+          analysis: latest.analysis,
+          timestamp: latest.updatedAt || latest.lastUpdated || new Date().toISOString()
+        });
+        console.log(`[ROOM ${roomId}] Sent latest analysis to ${username}`);
+      }
+    } catch (err) {
+      console.error(`[ROOM ${roomId}] Failed to load latest analysis:`, err.message);
+    }
   });
 
   socket.on("chat-message", ({ roomId, message }) => {

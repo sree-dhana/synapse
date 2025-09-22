@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import { createRoom, joinRoom } from "../api"
 import { io } from "socket.io-client"
 import ChatSectionSimple from "./ChatSectionSimple"
-import PdfAnalyzer from "../components/PdfAnalyzer"
+import GeminiPdfAnalyzer from "../components/GeminiPdfAnalyzer"
 import FloatingMenu from "../components/FloatingMenu"
 import TaskManager from "../components/TaskManager"
 import "../styles/room.css"
@@ -18,6 +18,7 @@ const Room = () => {
   const [status, setStatus] = useState("")
   const [loading, setLoading] = useState(false)
   const [username] = useState(() => localStorage.getItem('username') || "Anonymous")
+  const [pdfTasks, setPdfTasks] = useState([]);
 
   useEffect(() => {
     const s = io(socketURL, { withCredentials: true })
@@ -36,6 +37,13 @@ const Room = () => {
     if (!socket) return
     socket.emit('join-room', { roomId: rid, username })
   }, [socket, username])
+
+  // Handle PDF tasks generation callback
+  const handlePdfTasksGenerated = useCallback((tasks, fileName) => {
+    console.log('[Room] PDF tasks generated:', tasks, 'from file:', fileName);
+    setPdfTasks(tasks);
+    setStatus(`✅ Added ${tasks.length} tasks from ${fileName} to Task Manager`);
+  }, []);
 
   const handleCreate = async () => {
     setLoading(true); setStatus("")
@@ -93,10 +101,15 @@ const Room = () => {
         </div>
         <div className="right-section">
           <div className="pdf-section">
-            <PdfAnalyzer />
+            <GeminiPdfAnalyzer onTasksGenerated={handlePdfTasksGenerated} roomId={roomId} socket={socket} />
           </div>
           <div className="task-section">
-            <TaskManager socket={socket} roomId={roomId} username={username} />
+            <TaskManager 
+              socket={socket} 
+              roomId={roomId} 
+              username={username} 
+              pdfTasks={pdfTasks}
+            />
           </div>
         </div>
       </div>

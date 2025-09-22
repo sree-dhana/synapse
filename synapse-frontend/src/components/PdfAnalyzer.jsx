@@ -1,77 +1,96 @@
-"use client"
+import React, { useState } from "react";
+import axios from "axios";
 
-import { useState } from "react"
+export default function PdfAnalyzer({ token, roomId }) {
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [roadmap, setRoadmap] = useState(null);
 
-const PdfAnalyzer = () => {
-  const [uploadedFile, setUploadedFile] = useState(null)
+  const handleFile = (e) => setFile(e.target.files[0]);
 
-  const roadmapSteps = [
-    { id: 1, title: "Foundation", description: "Learn React basics and JSX syntax", status: "completed" },
-    { id: 2, title: "Components", description: "Master functional and class components", status: "completed" },
-    { id: 3, title: "State Management", description: "Understand useState and useEffect hooks", status: "current" },
-    { id: 4, title: "Advanced Patterns", description: "Context API and custom hooks", status: "upcoming" },
-    { id: 5, title: "Routing", description: "Implement client-side routing with React Router", status: "upcoming" },
-    { id: 6, title: "Performance", description: "Optimize with memo, useMemo, and useCallback", status: "upcoming" },
-    { id: 7, title: "Testing", description: "Write unit tests with Jest and React Testing Library", status: "upcoming" },
-    { id: 8, title: "Deployment", description: "Deploy React apps to production", status: "upcoming" },
-    { id: 9, title: "Advanced State", description: "Redux or Zustand for complex state management", status: "upcoming" },
-    { id: 10, title: "TypeScript", description: "Add type safety with TypeScript", status: "upcoming" },
-  ]
+  const upload = async () => {
+    if (!file) return alert("Please select a PDF first");
+    const fd = new FormData();
+    fd.append("pdf", file);
+    fd.append("roomId", roomId);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0]
-    if (file && file.type === "application/pdf") {
-      setUploadedFile(file)
+    setLoading(true);
+    try {
+      const res = await axios.post("http://localhost:5000/api/pdf/analyze", fd, {
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      setRoadmap(res.data.roadmap);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || "Upload failed");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="pdf-analyzer-container">
-      {/* Upload Section */}
-      <div className="upload-section">
-        <div className="upload-card">
-          <h2 className="section-title">AI PDF Analyzer</h2>
-          <div className="upload-area">
-            <input type="file" accept=".pdf" onChange={handleFileUpload} className="file-input" id="pdf-upload" />
-            <label htmlFor="pdf-upload" className="upload-label">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="upload-icon">
-                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-              </svg>
-              <span className="upload-text">{uploadedFile ? uploadedFile.name : "Click to upload PDF"}</span>
-              <span className="upload-subtext">
-                {uploadedFile ? "File ready for analysis" : "Drag and drop or click to browse"}
-              </span>
-            </label>
-          </div>
-        </div>
-      </div>
+    <div>
+      <h3>AI PDF Analyzer</h3>
+      <input type="file" accept="application/pdf" onChange={handleFile} />
+      <button onClick={upload} disabled={loading}>
+        {loading ? "Analyzing..." : "Upload & Analyze"}
+      </button>
 
-      {/* Roadmap Section */}
-      <div className="roadmap-section">
-        <h3 className="section-title">Learning Roadmap</h3>
-        <div className="roadmap-container">
-          {roadmapSteps.map((step, index) => (
-            <div key={step.id} className={`roadmap-step ${step.status}`}>
-              <div className="step-indicator">
-                <span className="step-number">{index + 1}</span>
-              </div>
-              <div className="step-content">
-                <h4 className="step-title">{step.title}</h4>
-                <p className="step-description">{step.description}</p>
-              </div>
-              <div className={`step-status ${step.status}`}>
-                {step.status === "completed" && "✓"}
-                {step.status === "current" && "→"}
-                {step.status === "upcoming" && "○"}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-
+      {roadmap && <RoadmapViewer roadmap={roadmap} token={token} />}
     </div>
-  )
+  );
 }
 
-export default PdfAnalyzer
+function RoadmapViewer({ roadmap, token }) {
+  return (
+    <div>
+      <h4>Summary</h4>
+      <p>{roadmap.summary}</p>
+
+      <h4>Roadmap</h4>
+      {roadmap.roadmap.map((ms) => (
+        <div key={ms.milestone_id} style={{ border: "1px solid #555", margin: "8px", padding: "8px" }}>
+          <h5>{ms.title} ({ms.estimated_hours}h)</h5>
+          <p>{ms.description}</p>
+          <ul>
+            {ms.tasks.map((t) => (
+              <li key={t.task_id}>
+                <b>{t.title}</b> — {t.description} — {t.points} pts
+                <CompleteTaskButton roadmapId={roadmap._id} taskId={t.task_id} token={token} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CompleteTaskButton({ roadmapId, taskId, token }) {
+  const [done, setDone] = useState(false);
+
+  const handleComplete = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/roadmaps/${roadmapId}/tasks/${taskId}/complete`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.ok) {
+        setDone(true);
+        alert(`+${res.data.pointsAwarded} points`);
+      }
+    } catch (err) {
+      alert(err.response?.data?.error || "Error completing task");
+    }
+  };
+
+  return (
+    <button disabled={done} onClick={handleComplete} style={{ marginLeft: "1rem" }}>
+      {done ? "Completed ✔" : "Complete Task"}
+    </button>
+  );
+}
