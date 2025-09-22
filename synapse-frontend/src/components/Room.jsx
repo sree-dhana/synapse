@@ -8,8 +8,8 @@ import GeminiPdfAnalyzer from "../components/GeminiPdfAnalyzer"
 import FloatingMenu from "../components/FloatingMenu"
 import TaskManager from "../components/TaskManager"
 import "../styles/room.css"
-
-const socketURL = "http://localhost:5000"
+import { SOCKET_URL } from "../config/apiConfig"
+const socketURL = SOCKET_URL
 
 const Room = () => {
   const [socket, setSocket] = useState(null)

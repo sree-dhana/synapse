@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { API_URL } from '../config/apiConfig';
 import { SummaryDisplay, RoadmapDisplay, TasksDisplay, ResourcesDisplay } from './AnalysisDisplayComponents';
 import './GeminiPdfAnalyzer.css';
 
@@ -13,7 +14,7 @@ const GeminiPdfAnalyzer = ({ onTasksGenerated, roomId, socket }) => {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [tasksSentToManager, setTasksSentToManager] = useState(false);
+  // No local flag needed; TaskManager reflects state
 
   // Listen for room-wide analysis updates (for new joiners or when someone else analyzes)
   React.useEffect(() => {
@@ -30,8 +31,7 @@ const GeminiPdfAnalyzer = ({ onTasksGenerated, roomId, socket }) => {
       setAnalysisResult(merged);
       // Optionally feed tasks into Task Manager for new joiners
       if (onTasksGenerated && payload.analysis?.tasks?.length) {
-        onTasksGenerated(payload.analysis.tasks, payload.fileName);
-        setTasksSentToManager(true);
+  onTasksGenerated(payload.analysis.tasks, payload.fileName);
       }
     };
     socket.on('room-analysis-updated', handler);
@@ -114,7 +114,7 @@ const GeminiPdfAnalyzer = ({ onTasksGenerated, roomId, socket }) => {
     setError(null);
     setAnalysisResult(null);
     setUploadProgress(0);
-    setTasksSentToManager(false);
+  // no-op
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -126,8 +126,7 @@ const GeminiPdfAnalyzer = ({ onTasksGenerated, roomId, socket }) => {
   const handleSendTasksToManager = (tasks) => {
     if (onTasksGenerated && tasks && tasks.length > 0) {
       console.log('📋 Sending tasks to Task Manager:', tasks);
-      onTasksGenerated(tasks, selectedFile?.name);
-      setTasksSentToManager(true);
+  onTasksGenerated(tasks, selectedFile?.name);
       
       // Show success notification
       alert(`✅ ${tasks.length} tasks have been added to your Task Manager!`);
@@ -171,7 +170,7 @@ const GeminiPdfAnalyzer = ({ onTasksGenerated, roomId, socket }) => {
       if (roomId) formWithRoom.append('roomId', roomId);
 
       // Make API call to backend
-      const response = await fetch('http://localhost:5000/api/gemini-analyze-pdf', {
+      const response = await fetch(`${API_URL}/gemini-analyze-pdf`, {
         method: 'POST',
         body: formWithRoom,
         // Don't set Content-Type header - let browser set it with boundary for multipart/form-data

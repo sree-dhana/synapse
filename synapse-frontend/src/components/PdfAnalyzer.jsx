@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config/apiConfig";
 
 export default function PdfAnalyzer({ token, roomId }) {
   const [file, setFile] = useState(null);
@@ -16,7 +17,7 @@ export default function PdfAnalyzer({ token, roomId }) {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/pdf/analyze", fd, {
+  const res = await axios.post(`${API_URL}/pdf/analyze`, fd, {
         headers: { 
           "Authorization": `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
@@ -75,7 +76,7 @@ function CompleteTaskButton({ roadmapId, taskId, token }) {
   const handleComplete = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/roadmaps/${roadmapId}/tasks/${taskId}/complete`,
+  `${API_URL}/roadmaps/${roadmapId}/tasks/${taskId}/complete`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

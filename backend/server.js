@@ -9,6 +9,7 @@ const pdfRoutes = require('./routes/pdfRoutes');
 const geminiPdfRoutes = require('./routes/geminiPdfRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
+const FRONTEND_ORIGIN = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
 const taskRoutes = require('./routes/taskRoutes');
 
 
@@ -16,7 +17,12 @@ app.use(express.json());
 
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow no-origin requests (like curl) and explicit allowed origins
+    const allowed = [FRONTEND_ORIGIN, 'https://synapse-a7uk.onrender.com'];
+    if (!origin || allowed.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
@@ -31,7 +37,11 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+      const allowed = [FRONTEND_ORIGIN, 'https://synapse-a7uk.onrender.com'];
+      if (!origin || allowed.includes(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET','POST'],
     credentials: true
   }
