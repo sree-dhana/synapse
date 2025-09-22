@@ -201,7 +201,7 @@ const PdfUploader = () => {
 
 ```bash
 curl -X POST \
-  http://localhost:5000/api/analyze-pdf \
+  https://synapse-a7uk.onrender.com/api/analyze-pdf \
   -H "Content-Type: multipart/form-data" \
   -F "pdf=@/path/to/your/document.pdf"
 ```
@@ -217,7 +217,7 @@ async function analyzePdf(filePath) {
   const formData = new FormData();
   formData.append('pdf', fs.createReadStream(filePath));
 
-  const response = await fetch('http://localhost:5000/api/analyze-pdf', {
+  const response = await fetch('https://synapse-a7uk.onrender.com/api/analyze-pdf', {
     method: 'POST',
     body: formData
   });

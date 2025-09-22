@@ -232,7 +232,7 @@ const analyzePdf = async (file) => {
 ### cURL Example
 ```bash
 curl -X POST \
-  http://localhost:5000/api/gemini-analyze-pdf \
+  https://synapse-a7uk.onrender.com/api/gemini-analyze-pdf \
   -H "Content-Type: multipart/form-data" \
   -F "pdf=@/path/to/document.pdf"
 ```
@@ -311,11 +311,11 @@ curl -X POST \
 ### Backend Testing
 ```bash
 # Test health endpoint
-curl http://localhost:5000/api/gemini-health
+curl https://synapse-a7uk.onrender.com/api/gemini-health
 
 # Test PDF upload
 curl -X POST \
-  http://localhost:5000/api/gemini-analyze-pdf \
+  https://synapse-a7uk.onrender.com/api/gemini-analyze-pdf \
   -F "pdf=@test-document.pdf"
 ```
 

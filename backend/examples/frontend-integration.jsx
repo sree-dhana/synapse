@@ -40,7 +40,7 @@ const PdfAnalyzer = () => {
       formData.append('pdf', selectedFile);
 
       // Call the API endpoint
-      const response = await fetch('http://localhost:5000/api/analyze-pdf', {
+      const response = await fetch('https://synapse-a7uk.onrender.com/api/analyze-pdf', {
         method: 'POST',
         body: formData,
         // Don't set Content-Type header - let browser set it with boundary
@@ -170,7 +170,7 @@ export const analyzePdfFile = async (file) => {
   formData.append('pdf', file);
 
   try {
-    const response = await fetch('/api/analyze-pdf', {
+    const response = await fetch('https://synapse-a7uk.onrender.com/api/analyze-pdf', {
       method: 'POST',
       body: formData
     });
