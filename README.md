@@ -1,6 +1,6 @@
 # Synapse
 
-Synapse is a full-stack web application featuring a Node.js/Express backend and a React (Vite) frontend. It provides real-time chat, room management, authentication, and collaborative tools.
+Synapse is a full-stack web application featuring a Node.js/Express backend and a React (Vite) frontend with ai pdf analysis and task recommendations. It provides real-time chat, room management, authentication, and collaborative tools.
 
 ## Features
 
@@ -16,7 +16,7 @@ Synapse is a full-stack web application featuring a Node.js/Express backend and 
 
 - **Frontend:** React, Vite, CSS
 - **Backend:** Node.js, Express
-- **Database:** (Add your DB info here)
+- **Database:** MONGO ATLAS
 
 ## Project Structure
 
